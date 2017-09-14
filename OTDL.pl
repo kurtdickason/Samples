@@ -26,7 +26,7 @@
 #
 # ************************************************************************** #
 #
-### One Touch Ultra Format
+### One Touch Ultra Format (OLD, not in scope, for reference)
 #--------------------------
 # Data File Examples: OTDL_2006-0527.TXT
 #P 150,"QTZ0004CT","MG/DL " 05B3
@@ -42,7 +42,7 @@
 #P "FRI","05/26/06","12:04:32   ","  068 ", 00 0820
 #P "FRI","05/26/06","10:54:24   ","  083 ", 00 0821
 #
-### One Touch Ultra 2 Format
+### One Touch Ultra 2 Format (current, in scope)
 #--------------------------
 #P 040,"ZSK2326BY","MG/DL " 05B7
 #P "SUN","03/07/10","11:09:13   ","  086 ","N","00", 00 09BE
@@ -62,7 +62,11 @@
 # There is one row of meter information that is not relevent here.
 # eg. P 500,"ZSK2326BY","MG/DL " 05B8
 #
-#All following ROW's Target Data:
+#All following ROW's Target Data (VVV):
+#   + 1st Letter of DOW
+#   |     ++++++++ Date of data
+#   |     |      |   ++ Hour of data
+#   |     |      |   ||              +++Data, mg/dL
 #   V     VVVVVVVV   VV              VVV
 #P "SAT","03/06/10","16:35:12   ","  130 ","N","00", 00 09A8
 #   ^     ^^^^^^^^   ^^              ^^^
@@ -132,8 +136,8 @@ while (<F1>) {
 		$in{$l}=$_; 			# Save it in input buffer{line#}
 		print "DEBUG: [l=$l][in{$l}=$in{$l}]\n" if $DEBUG;
 		$l++;
-	}
-}
+	} # End-if
+} # End-while
 
 #
 # Init row data with '-'s
