@@ -9,7 +9,7 @@
 #    the Free Software Foundation, either version 3 of the License, or
 #    any later version.
 #
-#    This program is distributed in the hope that it will be useful,
+#    This program is distributed in the hope that it will be utimeseful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
@@ -26,7 +26,7 @@
 #
 # ************************************************************************** #
 #
-### One Touch Ultra Format (OLD, not in scope, for reference)
+### One Touch Ultra Format
 #--------------------------
 # Data File Examples: OTDL_2006-0527.TXT
 #P 150,"QTZ0004CT","MG/DL " 05B3
@@ -42,7 +42,7 @@
 #P "FRI","05/26/06","12:04:32   ","  068 ", 00 0820
 #P "FRI","05/26/06","10:54:24   ","  083 ", 00 0821
 #
-### One Touch Ultra 2 Format (current, in scope)
+### One Touch Ultra 2 Format
 #--------------------------
 #P 040,"ZSK2326BY","MG/DL " 05B7
 #P "SUN","03/07/10","11:09:13   ","  086 ","N","00", 00 09BE
@@ -62,11 +62,7 @@
 # There is one row of meter information that is not relevent here.
 # eg. P 500,"ZSK2326BY","MG/DL " 05B8
 #
-#All following ROW's Target Data (VVV):
-#   + 1st Letter of DOW
-#   |     ++++++++ Date of data
-#   |     |      |   ++ Hour of data
-#   |     |      |   ||              +++Data, mg/dL
+#All following ROW's Target Data:
 #   V     VVVVVVVV   VV              VVV
 #P "SAT","03/06/10","16:35:12   ","  130 ","N","00", 00 09A8
 #   ^     ^^^^^^^^   ^^              ^^^
@@ -86,6 +82,13 @@
 # 05/28/06,S, -,-,101,243,-,157,-,090,-,-,173,-,251,-,-,-,-,-,-,-,-,-,-,-
 # H Val           6   7     9     11      14    16
 # Hour              ^       ^     ^       ^     ^
+
+# INCLUDES
+# From CPAN John Von Essen > Date-Day-1.04 > Date::Day
+# (http://search.cpan.org/~essenz/Date-Day-1.04/Day.pm)
+# Had to gunzip, untar, make, make install, test.pl
+# Returns the day of the week from any date.
+use Date::Day
 
 #DECLARATIONS		#TYPE		#SOURCE		#DESCRIPTION
 my $DEBUG=0;		#int (flag)			# Flag to indicate print debug output
@@ -136,8 +139,8 @@ while (<F1>) {
 		$in{$l}=$_; 			# Save it in input buffer{line#}
 		print "DEBUG: [l=$l][in{$l}=$in{$l}]\n" if $DEBUG;
 		$l++;
-	} # End-if
-} # End-while
+	}
+}
 
 #
 # Init row data with '-'s
@@ -163,6 +166,8 @@ while ($l-- >= 0) {
 	($day,$date2,$time,$val,$rest)=split(/,/);
 	# --- Assign time values to declared vars. Mostly interested in $h
 	($h,$m,$s)=split(/:/,$time);
+	($MM,$DD,$YYYY)=split(/\//,$date2);
+    $date2=sprintf("%02d/%02d/%d",$MM,$DD,$YYYY);
 	# --- If (the dates are different) AND (the value is >= the start hour of the next day) then print existing data and start a new record
 	if (($date2 ne $date1) and ($h ge $time0)) {
 		# 
@@ -171,7 +176,8 @@ while ($l-- >= 0) {
 		# --- Save the current record date as the new working row date
 		$date1=$date2;
 		# --- Set the current day
-		$day=~s/..$//;
+        $day = &day($MM,$DD,$YYYY);
+		$day=~s/^(.)..*/\1/;
 		# --- If the first pass just print out the date and continue processing.
 		if ( $first == 1 ) {
 			# --- Print the start of row 01/01/12 (mm/dd/yy) and the day-of-week (Mon,Tue,...)
@@ -238,3 +244,10 @@ print "\n";
 #
 ### END
 #
+# REVISIONS
+# WHO   Date/Ver    Description
+# ---   ---------   ----------------------------------------------------------  
+# KFD   2018-0103   Added new functionality for computing day of the week
+#       1.2         from the date rather than using the file. This is to
+#                   accomodate downloaded Medtronic CSV files (no day is
+#                   recorded).
