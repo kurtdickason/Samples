@@ -1,15 +1,18 @@
 #!/usr/bin/perl
 # 
 # ************************************************************************** #
-#  OTDL.pl program for formatting One Touch text files into a csv form.
-#    Copyright (C) 2017  Kurt F. Dickason
+#  OTDL.pl program for formatting One Touch text files into a csv form. Also
+#          can read Medtronic Carelink Data CSV files that have been
+#          "massaged" into looking like Ultra2 meter dump.
+#
+#    Copyright (C) 2017,2018  Kurt F. Dickason
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    any later version.
 #
-#    This program is distributed in the hope that it will be utimeseful,
+#    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
@@ -26,7 +29,7 @@
 #
 # ************************************************************************** #
 #
-### One Touch Ultra Format
+### One Touch Ultra Format (OLD, not in scope, for reference)
 #--------------------------
 # Data File Examples: OTDL_2006-0527.TXT
 #P 150,"QTZ0004CT","MG/DL " 05B3
@@ -42,7 +45,7 @@
 #P "FRI","05/26/06","12:04:32   ","  068 ", 00 0820
 #P "FRI","05/26/06","10:54:24   ","  083 ", 00 0821
 #
-### One Touch Ultra 2 Format
+### One Touch Ultra 2 Format (current, in scope)
 #--------------------------
 #P 040,"ZSK2326BY","MG/DL " 05B7
 #P "SUN","03/07/10","11:09:13   ","  086 ","N","00", 00 09BE
@@ -63,9 +66,9 @@
 # eg. P 500,"ZSK2326BY","MG/DL " 05B8
 #
 #All following ROW's Target Data:
-#   V     VVVVVVVV   VV              VVV
+#         VVVVVVVV   VV              VVV
 #P "SAT","03/06/10","16:35:12   ","  130 ","N","00", 00 09A8
-#   ^     ^^^^^^^^   ^^              ^^^
+#         ^^^^^^^^   ^^              ^^^
 #
 #
 #
@@ -139,8 +142,8 @@ while (<F1>) {
 		$in{$l}=$_; 			# Save it in input buffer{line#}
 		print "DEBUG: [l=$l][in{$l}=$in{$l}]\n" if $DEBUG;
 		$l++;
-	}
-}
+	} # End-if
+} # End-while
 
 #
 # Init row data with '-'s
@@ -176,7 +179,7 @@ while ($l-- >= 0) {
 		# --- Save the current record date as the new working row date
 		$date1=$date2;
 		# --- Set the current day
-        $day = &day($MM,$DD,$YYYY);
+		$day = &day($MM,$DD,$YYYY);
 		$day=~s/^(.)..*/\1/;
 		# --- If the first pass just print out the date and continue processing.
 		if ( $first == 1 ) {
